@@ -142,6 +142,20 @@ function mutate(genome) {
 	return mutated.join('')
 }
 
+function makeOffspringFromSpecies(innovations, species) {
+	const singles = [...species]
+	const offsprings = []
+	while(singles.length > 1) {
+		const indexA = Math.floor(Math.random() * singles.length)
+		const [A] = singles.splice(indexA, 1)
+		const indexB = Math.floor(Math.random() * singles.length)
+		const [B] = singles.splice(indexB, 1)
+		const offspring = makeOffspring(innovations, A.genome, B.genome)
+		offsprings.push(offspring)
+	}
+	return offsprings
+}
+
 export default function createNextGeneration(entities, world, desiredCount) {
 	const innovations = inferInnovations(entities.flatMap((entity) => entity.genome.split('/')))
 	const species = segregateIntoSpecies(innovations, entities)
@@ -158,19 +172,21 @@ export default function createNextGeneration(entities, world, desiredCount) {
 		},
 		[]
 	))
+	const biggestSpecies = fittestEntities.reduce((biggest, pool) => Math.max(biggest, pool.length), 0)
 	const nextGeneration = fittestEntities.flatMap((pool) => pool.map((entity) => entity.genome))
-	while (nextGeneration.length < desiredCount) {
-		fittestEntities.forEach((pool) => {
-			const singles = [...pool]
-			while(singles.length > 1) {
-				const indexA = Math.floor(Math.random() * singles.length)
-				const [A] = singles.splice(indexA, 1)
-				const indexB = Math.floor(Math.random() * singles.length)
-				const [B] = singles.splice(indexB, 1)
-				const offspring = makeOffspring(innovations, A.genome, B.genome)
-				nextGeneration.push(offspring)
-			}
-		})
+	console.log('biggest species:', biggestSpecies)
+	if(biggestSpecies > 2) {
+		while (nextGeneration.length < desiredCount) {
+			fittestEntities.forEach((pool) => {
+				const offspring = makeOffspringFromSpecies(innovations, pool)
+				nextGeneration.push(...offspring)
+			})
+		}
+	} else {
+		while (nextGeneration.length < desiredCount) {
+			const offspring = makeOffspringFromSpecies(innovations, fittestEntities.flat())
+			nextGeneration.push(...offspring)
+		}
 	}
 	return nextGeneration.map((genome) => mutate(genome))
 }
