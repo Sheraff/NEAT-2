@@ -117,7 +117,7 @@ function makeOffspring(innovations, genomeA, genomeB) {
 }
 
 function mutate(genome) {
-	const MUTATION_RATE = .1
+	const MUTATION_RATE = .001
 	const mutated = []
 	for (let i = 0; i < genome.length; i++) {
 		const base = genome[i]
@@ -174,7 +174,9 @@ export default function createNextGeneration(entities, world, desiredCount) {
 	))
 	const biggestSpecies = fittestEntities.reduce((biggest, pool) => Math.max(biggest, pool.length), 0)
 	const nextGeneration = fittestEntities.flatMap((pool) => pool.map((entity) => entity.genome))
-	console.log('biggest species:', biggestSpecies)
+	console.log('number of entities:', entities.length)
+	console.log('number of species:', species.length)
+	console.log('biggest species after selection:', biggestSpecies)
 	if(biggestSpecies > 2) {
 		while (nextGeneration.length < desiredCount) {
 			fittestEntities.forEach((pool) => {
