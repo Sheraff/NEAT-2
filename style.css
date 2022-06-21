@@ -1,0 +1,21 @@
+body {
+	margin: 0;
+	background-color: #111;
+	color: #fff;
+	display: flex;
+}
+
+canvas {
+	height: 100vmin;
+	width: 100vmin;
+	margin: auto;
+	background-color: black;
+}
+
+h1 {
+	position: fixed;
+	top: 1em;
+	left: 1em;
+	margin: 0;
+	font-family: monospace;
+}
