@@ -48,6 +48,7 @@ export default class Entity {
 	}
 
 	getFitness(world) {
-		return 1 / Math.hypot(this.x - world.width * 0.25, this.y - world.height * 0.25)
+		return 1 / Math.abs(this.x - world.width * 0.25)
+		// return 1 / Math.hypot(this.x - world.width * 0.25, this.y - world.height * 0.25)
 	}
 }

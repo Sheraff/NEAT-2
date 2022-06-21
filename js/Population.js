@@ -74,7 +74,7 @@ function distanceBetweenGenomes(innovations, genomeA, genomeB) {
 
 function segregateIntoSpecies(innovations, [first, ...entities]) {
 	const species = [[first]]
-	const SPECIES_THRESHOLD = .2 // if distance(a, b) > speciesThreshold => a & b belong to ≠ species
+	const SPECIES_THRESHOLD = .5 // if distance(a, b) > speciesThreshold => a & b belong to ≠ species
 	for (let i = 0; i < entities.length; i++) {
 		const genomeA = entities[i].genome
 		const speciesIndex = species.findIndex((pool) => {
@@ -117,7 +117,7 @@ function makeOffspring(innovations, genomeA, genomeB) {
 }
 
 function mutate(genome) {
-	const MUTATION_RATE = .001
+	const MUTATION_RATE = .0001
 	const mutated = []
 	for (let i = 0; i < genome.length; i++) {
 		const base = genome[i]
@@ -177,7 +177,7 @@ export default function createNextGeneration(entities, world, desiredCount) {
 	console.log('number of entities:', entities.length)
 	console.log('number of species:', species.length)
 	console.log('biggest species after selection:', biggestSpecies)
-	if(biggestSpecies > 2) {
+	if(biggestSpecies >= 2) {
 		while (nextGeneration.length < desiredCount) {
 			fittestEntities.forEach((pool) => {
 				const offspring = makeOffspringFromSpecies(innovations, pool)
