@@ -38,7 +38,7 @@ async function ageWorld(world, steps, show = false) {
 async function loopWorlds(context, world, count) {
 	postMessage({ count })
 	postMessage({ type: 'run' })
-	await ageWorld(world, 1000, count % 10 === 0)
+	await ageWorld(world, 3000, count % 10 === 0)
 	postMessage({ type: 'create' })
 	const nextGenomes = createNextGeneration(world.entities, world, 500)
 	const nextWorld = new World(context)
