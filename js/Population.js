@@ -74,7 +74,7 @@ function distanceBetweenGenomes(innovations, genomeA, genomeB) {
 
 function segregateIntoSpecies(innovations, [first, ...entities]) {
 	const species = [[first]]
-	const SPECIES_THRESHOLD = .5 // if distance(a, b) > speciesThreshold => a & b belong to ≠ species
+	const SPECIES_THRESHOLD = .2 // if distance(a, b) > speciesThreshold => a & b belong to ≠ species
 	for (let i = 0; i < entities.length; i++) {
 		const genomeA = entities[i].genome
 		const speciesIndex = species.findIndex((pool) => {
@@ -138,7 +138,13 @@ function mutate(genome) {
 			'.',
 			Math.floor(Math.random() * 1296).toString(36),
 		)
+	} else if(Math.random() < MUTATION_RATE) {
+		const genes = mutated.join('').split('/')
+		const removeIndex = Math.floor(Math.random() * genes.length)
+		genes.splice(removeIndex, 1)
+		return genes.join('/')
 	}
+
 	return mutated.join('')
 }
 
@@ -163,7 +169,7 @@ export default function createNextGeneration(entities, world, desiredCount) {
 		(sum, entity) => sum + entity.getFitness(world) / pool.length,
 		0
 	))
-	const FITNESS_PERCENTILE = .8
+	const FITNESS_PERCENTILE = .6
 	const fittestEntities = species.map((pool, i) => pool.reduce(
 		(best, entity) => {
 			if(entity.getFitness(world) > FITNESS_PERCENTILE * fitnessPerSpecies[i])
@@ -173,23 +179,27 @@ export default function createNextGeneration(entities, world, desiredCount) {
 		[]
 	))
 	const biggestSpecies = fittestEntities.reduce((biggest, pool) => Math.max(biggest, pool.length), 0)
-	const nextGeneration = fittestEntities.flatMap((pool) => pool.map((entity) => entity.genome))
+	const survivors = fittestEntities.flatMap((pool, i) => pool.map((entity) => `${entity.genome}:${i}`))
+	const numberOfFittest = survivors.length
 	console.log('number of entities:', entities.length)
 	console.log('number of species:', species.length)
 	console.log('biggest species after selection:', biggestSpecies)
+	console.log('survivors:', fittestEntities.map((pool) => pool.length))
+	const nextGeneration = []
 	if(biggestSpecies >= 2) {
-		while (nextGeneration.length < desiredCount) {
-			fittestEntities.forEach((pool) => {
+		while (nextGeneration.length < desiredCount - numberOfFittest) {
+			fittestEntities.forEach((pool, i) => {
 				const offspring = makeOffspringFromSpecies(innovations, pool)
-				nextGeneration.push(...offspring)
+				nextGeneration.push(...offspring.map((genome) => `${genome}:${i}`))
 			})
 		}
 	} else {
-		while (nextGeneration.length < desiredCount) {
+		while (nextGeneration.length < desiredCount - numberOfFittest) {
 			const offspring = makeOffspringFromSpecies(innovations, fittestEntities.flat())
-			nextGeneration.push(...offspring)
+			nextGeneration.push(...offspring.map((genome) => `${genome}:${0}`))
 		}
 	}
+	nextGeneration.push(...survivors)
 	return nextGeneration.map((genome) => mutate(genome))
 }
 

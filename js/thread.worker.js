@@ -40,7 +40,7 @@ async function loopWorlds(context, world, count) {
 	postMessage({ type: 'run' })
 	await ageWorld(world, 1000, count % 10 === 0)
 	postMessage({ type: 'create' })
-	const nextGenomes = createNextGeneration(world.entities, world, 100)
+	const nextGenomes = createNextGeneration(world.entities, world, 500)
 	const nextWorld = new World(context)
 	nextWorld.entities = nextGenomes.map((genome) => new Entity(genome, nextWorld))
 	loopWorlds(context, nextWorld, count + 1)
@@ -50,8 +50,8 @@ async function loopWorlds(context, world, count) {
 	const context = await getContext()
 	postMessage({ type: 'create' })
 	const world = new World(context)
-	for(let i = 0; i < 100; i++) {
-		world.entities.push(new Entity(makeSimpleGenome(10), world))
+	for(let i = 0; i < 500; i++) {
+		world.entities.push(new Entity(makeSimpleGenome(5), world))
 	}
 	loopWorlds(context, world, 0)
 }

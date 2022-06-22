@@ -1,4 +1,7 @@
 import NeuralNetwork from "./Net.js"
+import colors from './colors.js'
+
+const SHAPES = ['square', 'circle', 'triangle']
 
 export default class Entity {
 	SENSES = [
@@ -11,8 +14,12 @@ export default class Entity {
 		/* rotate */ 	 (signal) => this.angle += signal,
 	]
 
-	constructor(genome, world) {
+	constructor(_genome, world) {
+		const [genome, color = 0] = _genome.split(':')
 		this.genome = genome
+		const index = Number(color)
+		this.color = colors[index % colors.length]
+		this.shape = SHAPES[Math.floor(index/colors.length) % SHAPES.length]
 		this.net = new NeuralNetwork(genome)
 		this.angle = Math.random() * Math.PI * 2
 		this.speed = 0
@@ -41,14 +48,31 @@ export default class Entity {
 	draw(context) {
 		context.save()
 		context.translate(this.x, this.y)
-		context.rotate(this.angle)
-		context.fillStyle = "red"
-		context.fillRect(-5, -5, 10, 10)
+		if(this.shape === 'circle') {
+			context.beginPath()
+			context.arc(0, 0, 7, 0, Math.PI * 2)
+			context.fillStyle = this.color
+			context.fill()
+		} else if(this.shape === 'triangle') {
+			context.rotate(this.angle)
+			context.beginPath()
+			context.moveTo(0, 0)
+			context.lineTo(-10, 10)
+			context.lineTo(-10, -10)
+			context.closePath()
+			context.fillStyle = this.color
+			context.fill()
+		} else {
+			context.rotate(this.angle)
+			context.fillStyle = this.color
+			context.fillRect(-5, -5, 10, 10)
+		}
 		context.restore()
 	}
 
 	getFitness(world) {
-		return 1 / Math.abs(this.x - world.width * 0.25)
+		return this.speed
+		// return 1 / Math.abs(this.x - world.width * 0.25)
 		// return 1 / Math.hypot(this.x - world.width * 0.25, this.y - world.height * 0.25)
 	}
 }
